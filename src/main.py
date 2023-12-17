@@ -1,19 +1,23 @@
 import pandas as pd
 import numpy as np
 import boto3
+from dotenv import load_dotenv
+import os
 
 pd.options.mode.chained_assignment = None  # default='warn'
 from helpers import to_numeric, temp_pres_filter, salinity_calculator, drop_invalid_datetime, trim_all_columns, drop_null_columns
 from constants import dict_temp_pres, temp_col_names, ec_col_names, coeffs_salinite
 
+load_dotenv() # load environment variables from .env file
+
 s3 = boto3.resource('s3',
-                     endpoint_url='http://127.0.0.1:9000/',
+                     endpoint_url = os.environ['SCW_ENDPOINT'],
                      config = boto3.session.Config(signature_version = 's3v4'),
-                     aws_access_key_id = 'vFvontbzIgSxTlj8a6DP',
-                     aws_secret_access_key = 'HlNyPAEdCPE2vKL68QsMd0HsEIKnqbysmA5EFuhX',
+                     aws_access_key_id = os.environ['SCW_ACCESS_KEY_ID'],
+                     aws_secret_access_key = os.environ['SCW_SECRET_ACCESS_KEY'],
                      aws_session_token = None)
 
-files = s3.Bucket('dataplatform').objects.all()
+files = s3.Bucket('astrolabe-expeditions-data').objects.all()
 for file in files:
     print(file)
 
@@ -86,9 +90,6 @@ def run():
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
     plt.show()
-
-    
-
 
 # if __name__ == "__main__":
 #     run()
